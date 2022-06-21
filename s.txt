@@ -1,0 +1,2942 @@
+/*--PL/SQL = procedural language
+- procedures
+- functions
+- packeges
+- triggers
+*/select * from employees/*
+The anonymous block - 3 parts
+
+declare
+    variables, constants, cursors, etc. (optional)
+begin
+    executable part (mandatory)
+    exceptions
+        treat the exceptions which can be raised in the block (optional)
+end;
+
+begin
+    null;
+end; -- simplest SP
+
+
+--STEP 1
+begin
+    select first_name, last_name from employees;
+end;
+-- we need to declare the variables
+
+
+--STEP 2
+declare
+    v_first_name varchar2(20); -- scalar values
+    v_last_name varchar2(20);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees;
+end;
+
+-- we can't put many results in scalar variables that stores one single value
+
+-- STEP 3
+declare
+    v_first_name varchar2(20); -- scalar values
+    v_last_name varchar2(20);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 110;
+end;
+
+-- we want to display the result
+
+--STEP 4
+set serveroutput on size 30000;
+declare
+    v_first_name varchar2(20); -- scalar values
+    v_last_name varchar2(20);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 110;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+end;
+
+--STEP 5
+set serveroutput on size 30000;
+declare
+    v_first_name varchar2(20); -- scalar values
+    v_last_name varchar2(20);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id >= 110;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+end;
+-- treat the exception (ORA-01422:) - TOO_MANY_ROWS
+
+-- STEP 6
+set serveroutput on size 30000;
+declare
+    v_first_name varchar2(20); -- scalar values
+    v_last_name varchar2(20);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id >= 110;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+    exception
+     -- predefined errors/excetions, nonpredefined exceptions, user defined exception
+     -- to see if the exception is predefined or not, we search by the code, that starts with "ORA"
+        when TOO_MANY_ROWS then
+            null;
+end;
+
+-- STEP 7 (display an exception message)
+set serveroutput on size 30000;
+declare
+    v_first_name varchar2(20); -- scalar values
+    v_last_name varchar2(20);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id >= 110;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+    exception
+     -- predefined errors/excetions, nonpredefined exceptions, user defined exception
+     -- to see if the exception is predefined or not, we search by the code, that starts with "ORA"
+        when TOO_MANY_ROWS then
+            dbms_output.put_line('The query returns more than one row');
+end;
+
+-- STEP 8
+declare
+    v_first_name varchar2(20); -- scalar values
+    v_last_name varchar2(20);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 1100;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+    exception
+     -- predefined errors/excetions, nonpredefined exceptions, user defined exception
+     -- to see if the exception is predefined or not, we search by the code, that starts with "ORA"
+        when TOO_MANY_ROWS then
+            dbms_output.put_line('The query returns more than one row');
+end;
+-- we got a new exception (ORA-01403: no data found) = NO_DATA_FOUND
+
+-- STEP 9
+declare
+    v_first_name varchar2(20); -- scalar values
+    v_last_name varchar2(20);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 1100;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+    exception
+     -- predefined errors/excetions, nonpredefined exceptions, user defined exception
+     -- to see if the exception is predefined or not, we search by the code, that starts with "ORA"
+        when TOO_MANY_ROWS then
+            dbms_output.put_line('The query returns more than one row');
+        when NO_DATA_FOUND then
+            dbms_output.put_line('The query doesn''t return any row');
+end;
+
+
+--STEP 10
+declare
+    v_first_name varchar2(2); -- scalar values
+    v_last_name varchar2(2);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+    exception
+     -- predefined errors/excetions, nonpredefined exceptions, user defined exception
+     -- to see if the exception is predefined or not, we search by the code, that starts with "ORA"
+        when TOO_MANY_ROWS then
+            dbms_output.put_line('The query returns more than one row');
+        when NO_DATA_FOUND then
+            dbms_output.put_line('The query doesn''t return any row');
+end;
+-- ORA-06502: PL/SQL: numeric or value error: character string buffer too small
+
+--STEP 11
+declare
+    v_first_name varchar2(2); -- scalar values
+    v_last_name varchar2(2);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+    exception
+        when TOO_MANY_ROWS then
+            dbms_output.put_line('The query returns more than one row');
+        when NO_DATA_FOUND then
+            dbms_output.put_line('The query doesn''t return any row');
+        when OTHERS then 
+            dbms_output.put_line('Another exception was raised');
+end;
+
+-- STEP 12
+declare
+    v_first_name varchar2(2); -- scalar values
+    v_last_name varchar2(2);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+    exception
+        when TOO_MANY_ROWS then
+            dbms_output.put_line('The query returns more than one row');
+        when NO_DATA_FOUND then
+            dbms_output.put_line('The query doesn''t return any row');
+        when OTHERS then 
+            dbms_output.put_line('Another exception was raised');
+            dbms_output.put_line(SQLERRM); -- returns the most recent exception = it's the message from the console
+            dbms_output.put_line(SQLCODE);
+end;
+
+-- STEP 13
+declare
+    v_first_name varchar2(2); -- scalar values
+    v_last_name varchar2(2);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+    exception
+        when OTHERS then 
+            dbms_output.put_line('Another exception was raised');
+            dbms_output.put_line(SQLERRM); -- returns the most recent exception = it's the message from the console
+            dbms_output.put_line(SQLCODE);
+        when TOO_MANY_ROWS then
+            dbms_output.put_line('The query returns more than one row');
+        when NO_DATA_FOUND then
+            dbms_output.put_line('The query doesn''t return any row');
+        
+end;
+-- you can't have the general exceptions first and after the predefined ones
+
+
+-- STEP 14
+declare
+    v_first_name varchar2(2); -- scalar values
+    v_last_name varchar2(2);
+begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee '||v_first_name||' '||v_last_name);
+    exception
+        when OTHERS then 
+            dbms_output.put_line('The code is throwing exceptions. Need to thret them!');
+            dbms_output.put_line(SQLERRM); -- returns the most recent exception = it's the message from the console
+            dbms_output.put_line(SQLCODE);
+end;
+Activity 2
+
+PLSQL Variables
+- we can see them between declare and begin block
+There are 2 types:
+ - scalar variables( it takes 1 single value), constants variables
+ - composite variables (more than 1 variable) We have here 2 value types : record, collection
+ 
+ NON-PLSQL Variables
+ - bind variables
+ - substitution variables
+ 
+ -- STEP 1
+ set serveroutput on
+ declare
+    v_first_name varchar2(20);
+    v_last_name varchar2(20);
+ begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee ' ||v_first_name|| ' ' ||  v_last_name);
+ end;
+ /
+ 
+ --STEP 2
+ set serveroutput on
+ declare
+    v_first_name varchar2(20);
+    v_last_name employees.last_name%type;
+ begin
+    select first_name, last_name into v_first_name, v_last_name from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee ' ||v_first_name|| ' ' ||  v_last_name);
+ end;
+ /
+ 
+ desc employees;
+ 
+ -- the last name is saved dynamically, taking directly from employee table VARCHAR2(25) 
+ 
+ -- Bind variables (NON-PLSQL Variables)
+ -- declared outside the block and prefixed with 'var' or 'variable'
+ -- STEP 3
+  set serveroutput on
+  var v_salary number; -- it s not mandatry to put ';' outside the block - bind variables
+ declare
+    v_first_name varchar2(20);
+    v_last_name employees.last_name%type;
+ begin
+    select first_name, last_name, salary into v_first_name, v_last_name, v_salary from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee ' ||v_first_name|| ' ' ||  v_last_name);
+ end;
+ /
+ -- PLS-00201: identifier 'V_SALARY' must be declared
+ 
+ -- STEP 4 ( make bind variables to be visible inside the block execution)
+ 
+ set serveroutput on
+  var v_salary number; -- it s not mandatry to put ';' outside the block - bind variables
+ declare
+    v_first_name varchar2(20);
+    v_last_name employees.last_name%type;
+ begin
+    select first_name, last_name, salary into v_first_name, v_last_name, :v_salary from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee ' ||v_first_name|| ' ' ||  v_last_name || ' has a salary of ' || :v_salary); 
+ end;
+ /
+ 
+ print v_salary; --SQL * PLUS -- can't be executable inside a PL/SQL block
+ 
+ -- STEP 5 (increse the salary with 100)
+  set serveroutput on
+  var v_salary number; -- it s not mandatry to put ';' outside the block - bind variables
+ declare
+    v_first_name varchar2(20);
+    v_last_name employees.last_name%type;
+ begin
+    select first_name, last_name, salary into v_first_name, v_last_name, :v_salary from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee ' ||v_first_name|| ' ' ||  v_last_name || ' has a salary of ' || :v_salary); 
+ end;
+ /
+ begin
+    :v_salary := :v_salary + 100;
+    dbms_output.put_line('Salary after the increse with 100: ' || :v_salary);
+ end;
+ /
+ 
+ -- STEP 6 (constants variables)
+ set serveroutput on
+  var v_salary number; -- it s not mandatry to put ';' outside the block - bind variables
+ declare
+    v_first_name varchar2(20);
+    v_last_name employees.last_name%type;
+    v_taxes constant number := 1.2;
+--  v_taxes constant number DEFAULT 1.2;
+ begin
+ -- v_taxes := 2.5; the value of the constants variable cannot be changed once you declared them
+    select first_name, last_name, salary into v_first_name, v_last_name, :v_salary from employees
+    where employee_id = 100;
+    dbms_output.put_line('Employee ' ||v_first_name|| ' ' ||  v_last_name || ' has a before taxes salary of ' || :v_salary); 
+    dbms_output.put_line('Afetr taxes the salary is: ' || :v_salary/v_taxes);
+ end;
+ /
+ begin
+    :v_salary := :v_salary + 100;
+    dbms_output.put_line('Salary after the increse with 100: ' || :v_salary);
+ end;
+ /
+ 
+ -- STEP 7 (SUBSTITUTION VARIABLES)
+  set serveroutput on
+  set define on -- mandatory for substitution variables
+  var v_salary number; 
+ declare
+    v_first_name varchar2(20);
+    v_last_name employees.last_name%type;
+    v_taxes constant number := 1.2;
+ begin
+    select first_name, last_name, salary into v_first_name, v_last_name, :v_salary from employees
+    where employee_id = &v_id;
+    dbms_output.put_line('Employee ' ||v_first_name|| ' ' ||  v_last_name || ' has a before taxes salary of ' || :v_salary); 
+    dbms_output.put_line('Afetr taxes the salary is: ' || round(:v_salary/v_taxes, 2));
+ end;
+ /
+ begin
+    :v_salary := :v_salary + 100;
+    dbms_output.put_line('Salary after the increse with 100: ' || :v_salary);
+ end;
+ /
+ -- the block will execute with the variable that i gave, that's why it's calld substitution
+ 
+ /*
+ Ex. 1
+ Create a SP that update the salary of a given employee (by substitution) for the following cases:
+  - 0 - 3500 (increase of the salary with 10 %)
+  - 3501 - 7500 increase of the salary with 5 %)
+  - 7501 - 15000 increase of the salary with 2 %)
+  - else the salary will have a decrease with 5%.
+  Display all the cases.
+ */
+ /* set serveroutput on
+  set define on
+  declare
+    v_salary employees.salary%type;
+  begin
+    select salary into v_salary from employees where employee_id = &v_id;
+    
+    dbms_output.put_line('Initial salary: ' || v_salary);
+    
+    if v_salary between 0 and 3500 then
+        v_salary := v_salary * 1.1;
+    elsif v_salary between 3501 and 7500 then
+        v_salary := v_salary * 1.05;
+    elsif v_salary between 7501 and 15000 then
+        v_salary := v_salary * 1.02;
+    else
+        v_salary := v_salary * 0.95;
+    end if;
+    
+     dbms_output.put_line('Final salary: ' || v_salary);
+  end;
+  /
+ 
+ 
+ -- PLSQL variables
+Composite variables:
+- record variables (rowtype, user-defined types)
+
+--rowtype
+
+set serveroutput on
+declare
+    v_emp employees%rowtype;
+begin
+    select * into v_emp from employees where employee_id = 110;
+    dbms_output.put_line('Employee '|| v_emp.first_name || ' ' || v_emp.last_name || ' was hired on ' || v_emp.hire_date);
+end;
+/
+    
+    select * from employees where employee_id=110;
+    
+-- user-defined types
+set serveroutput on
+declare
+    type t_emp is record(
+        first_name employees.first_name%type,
+        last_name employees.last_name%type,
+        hire_date date
+    );
+    v_emp t_emp;
+    
+begin
+    select first_name, last_name , hire_date into v_emp from employees where employee_id = 110;
+    dbms_output.put_line('Employee '|| v_emp.first_name || ' ' || v_emp.last_name || ' was hired on ' || v_emp.hire_date);
+end;
+/
+    
+-- FUNDAMENTAL CONTROL STRUCTURES
+1. Sequence statements
+2. Decisional (CASE/ IF-ELSE)
+3. LOOPS
+    3.1. With known number of steps (FOR)
+    3.2 With unknown number of steps (WHILE, LOOP);
+    
+2. Decisional 
+-- STEP 1 (IF-ELSE)
+set serveroutput on
+declare
+    v_salary number;
+begin
+    select salary into v_salary from employees where employee_id = 125;
+     dbms_output.put_line('Before: ' || v_salary);
+     if v_salary < 10000 then
+        v_salary := v_salary * 1.1; --10%
+    else
+        v_salary := v_salary * 1.05; --5%
+     end if;   
+    dbms_output.put_line('After: ' || v_salary);
+end;
+/
+
+-- STEP 2 (IF-ELSIF-ELSE)
+set serveroutput on
+declare
+    v_salary number;
+begin
+    select salary into v_salary from employees where employee_id = 125;
+     dbms_output.put_line('Before: ' || v_salary);
+     if v_salary between 0 and 4999 then
+        v_salary := v_salary * 1.1; --10%
+    elsif v_salary between 5000 and 10000 then
+        v_salary := v_salary * 1.2; --20%
+    else
+        v_salary := v_salary * 1.25; --25%
+     end if;   
+    dbms_output.put_line('After: ' || v_salary);
+end;
+/
+
+-- STEP 3
+declare
+    v_grade number := 7;
+begin
+    if v_grade < 5 then
+        dbms_output.put_line('Failed');
+    else
+        dbms_output.put_line('Passed');
+    end if;
+end;
+/
+
+-- STEP 4
+declare
+    v_grade number;
+begin
+    if v_grade < 5 then
+        dbms_output.put_line('Failed');
+    else
+        dbms_output.put_line('Passed');
+    end if;
+end;
+/
+-- is not correct, we should treat the null values
+
+-- STEP 5 (treating null values)
+declare
+    v_grade number;
+begin
+    if v_grade is null then
+        dbms_output.put_line('Absent');
+    elsif v_grade < 5 then
+        dbms_output.put_line('Failed');
+    else
+        dbms_output.put_line('Passed');
+    end if;
+end;
+/
+
+-- STEP 6 (check if grade is > 10)
+declare
+    v_grade number := 15;
+begin
+    if v_grade is null then
+        dbms_output.put_line('Absent');
+        
+    elsif v_grade between 0 and 4 then
+        dbms_output.put_line('Failed');
+    elsif v_grade between 5 and 10 then
+        dbms_output.put_line('Passed');
+    else
+        dbms_output.put_line('Wrong grade!');
+    end if;
+end;
+/
+
+-- STEP 7 (check the datatype of the grade, if it has decimals)
+
+declare 
+    v_grade number :=15;
+begin
+    if (round(v_grade) <> v_grade) then -- <> -> different operator
+    --     if (floor(v_grade) != v_grade) then
+    --     if (trunc(v_grade) != v_grade) then
+        dbms_output.put_line('Has decimals!');
+    elsif v_grade is null then
+        dbms_output.put_line('Absent!');
+    elsif v_grade between 0 and 4 then
+        dbms_output.put_line('Failed!');
+    elsif v_grade between 5 and 10 then
+        dbms_output.put_line('Passed!');
+   -- else
+   --     dbms_output.put_line('Wrong mark!');
+    end if;
+end;
+/
+
+-- STEP 8
+declare 
+    v_grade number :=15;
+begin
+    case
+        when (round(v_grade) <> v_grade) then 
+            dbms_output.put_line('Has decimals!');
+        when v_grade is null then
+            dbms_output.put_line('Absent!');
+        when v_grade between 0 and 4 then
+            dbms_output.put_line('Failed!');
+        when v_grade between 5 and 10 then
+            dbms_output.put_line('Passed!');
+        --else
+         --   dbms_output.put_line('Wrong mark!');
+    end case;
+end;
+/
+
+-- STEP 9
+declare 
+    v_grade number :=15;
+begin
+    case
+        when (round(v_grade) <> v_grade) then 
+            dbms_output.put_line('Has decimals!');
+        when v_grade is null then
+            dbms_output.put_line('Absent!');
+        when v_grade between 0 and 4 then
+            dbms_output.put_line('Failed!');
+        when v_grade between 5 and 10 then
+            dbms_output.put_line('Passed!');
+        --else
+         --   dbms_output.put_line('Wrong mark!');
+    end case;
+    exception when others then null;
+end;
+/
+
+-- LOOP
+    3.1. FOR
+    
+--STEP 1 (SUM OF ODD AND EVEN NUMBERS FROM STRING)
+set serveroutput on
+declare
+    v_string varchar2(30) := '42375423854826';
+    sum_odd number;
+    sum_even number;
+begin
+    for i in 1..length(v_string) loop
+        dbms_output.put_line(i);
+    end loop;
+end;
+/
+    
+--STEP 2
+set serveroutput on
+declare
+    v_string varchar2(30) := '42375423854826';
+    sum_odd number := 0;
+    sum_even number := 0;
+    c char;
+begin
+    for i in 1..length(v_string) loop
+        dbms_output.put_line(i);
+        c := substr(v_string, i, 1);
+        if c mod 2 = 0 then
+            sum_even := sum_even + c;
+        else
+            sum_odd := sum_odd + c;
+        end if;    
+    end loop;
+    dbms_output.put_line('Sum of evens: ' || sum_even);
+    dbms_output.put_line('Sum of odd: ' || sum_odd);
+end;
+/
+  
+--CURSORS
+= is a pointer (identifier) towards the memory called context.
+There are 2 types:
+- implicit -> managed by the system (PL/SQL)
+- explicit -> managed by the programmer
+
+1. Implicit cursor (attributes):
+ - SQL%ROWCOUNT -> nb of rows
+ - SQL%FOUND -> it's like a boolean variable that returns a true result for the SP
+ - SQL%NOTFOUND -> the opposite of found
+ 
+2. Explicit cursor -> is used for indivisually processing each line (record) that is loaded in the memory by a select statement
+
+The state of an explicit cursor:
+- cursor_name%ISOPEN --cursor_name = the name you want to give for the cursor (return true / false if the cursor is opened)
+- cursor_name%NOTFOUND - return true if the most recent FETCH didn't return any row
+- cursor_name%FOUND - the complement of NOTFOUND
+- cursor_name%ROWCOUNT - the number of rows returned up until the current moment
+
+1. Implicit cursor
+--1. Delete a row from Product_information table and cont the number of deleted ones.
+-- SQL%ROWCOUNT
+set serveroutput on
+declare
+nb_r number(2);
+begin
+    delete from product_information where product_id = 3071;
+    nb_r := SQL%ROWCOUNT;
+    dbms_output.put_line(nb_r || ' rows deleted.');
+    commit;
+end;
+/
+
+--FOUND / NOT FOUND
+--2.Try to modify the name of the product 113. If the product doesn't exist(the update command won't modify anything), 
+--display a message.
+
+begin
+    update product_information set product_name = 'PC' where product_id = 113;
+    if SQL%NOTFOUND then
+        dbms_output.put_line('The product 113 doesn''t exist');
+    end if;
+end;
+/
+
+
+2. Explicit cursor
+
+Steps:
+1. declare variables in SP in which values of cursor's row will be loaded;
+2. declare the explicit cursor by giving a name and defining a query
+    declare cursor cursor_name IS SELECT ..... (rowtype)
+3. open cursor
+    OPEN cursor_name;
+4. FETCH data from the current row of the cursor (to load in the variables)
+    FETCH cursor_name INTO var1, var2, ...
+5. close cursor
+    CLOSE cursor_name;
+
+--3. Display and calculate salary after apply taxes: if salary > 2000 => apply taxes of 16%
+                                                --   if salary < 2000 => taxes won''t be applied.
+
+                                                
+ declare
+    cursor c is select first_name, last_name, salary from employees;
+    row_c c%rowtype;
+ begin
+    open c;
+    loop
+        fetch c into row_c;
+        dbms_output.put_line('Before- salary of employee ' || row_c.first_name|| ' ' || row_c.last_name || ' is ' 
+        || row_c.salary);
+        
+        if(row_c.salary > 2000)
+            then row_c.salary := row_c.salary * 0.86;
+        else
+            row_c.salary := row_c.salary;
+            
+         dbms_output.put_line('After taxes - salary of employee ' || row_c.first_name|| ' ' || row_c.last_name || ' is ' 
+        || row_c.salary);  
+        end if;
+        
+        exit when c%notfound;
+    end loop;
+    close c;
+ end;
+ /
+ 
+ -- 4. Display the regions that begin with 'A' or 'a'
+ 
+ declare
+    cursor c is select region_id, region_name from regions where upper(region_name) like 'A%';
+    id regions.region_id%type;
+    name regions.region_name%type;
+ begin
+    dbms_output.put_line('The regions that starts with A: ');
+    open c;
+    loop
+        fetch c into id, name;
+        exit when c%notfound;
+        dbms_output.put_line('The region ' || id || ' is called ' || name);
+    end loop;
+    close c;
+ end;
+ /
+ 
+ -- managing the cursor by using for loop
+ --5. Display the regions that begin with 'A' or 'a'
+ declare
+    cursor c is select region_id, region_name from regions where upper(region_name) like 'A%';
+    
+ begin
+    dbms_output.put_line('The regions that starts with A: ');
+    for region in c loop  
+        dbms_output.put_line('The region ' || region.region_id || ' is called ' || region.region_name);
+    end loop;
+ end;
+ /
+ 
+ -- CURSORS WITH PARAMETERS
+ The declaration:
+    cursor cursor_name (parameter1 data_type, parameter2 data_type, ...) is select
+    
+- open cursor
+    open cursor_name(parameter1_value, parameter2_value, ...)
+    
+-- 6.Display the products that have a total ordered quantity larger than a value received as a parameter
+declare
+    CURSOR c_prod (p_val NUMBER) IS 
+    select p.product_id prod, sum(quantity) total_quantity 
+    from product_information p, order_items o
+    where p.product_id=o.product_id
+    group by p.product_id 
+    HAVING sum(quantity)>p_val
+    ORDER BY total_quantity desc;
+    
+    v_val NUMBER(5);
+    rec_prod c_prod%rowtype;
+BEGIN
+    v_val:=50;
+    DBMS_OUTPUT.PUT_LINE('The products that have a total ordered quantity larger than  '|| v_val);
+    IF NOT c_prod%ISOPEN THEN
+        OPEN c_prod (v_val);
+    END IF;
+    LOOP
+        FETCH c_prod into rec_prod;
+        EXIT WHEN c_prod%notfound;
+        DBMS_OUTPUT.PUT_LINE(rec_prod.total_quantity||' pieces of product '||rec_prod.prod||' were ordered');
+    END LOOP;
+    
+    CLOSE c_prod;
+END;
+/
+
+ -- for update clause (next time)
+ 
+ Cursor 
+1. Implicit and exclict cursor
+
+
+--Display product names for the products that have been orderd at least once
+select distinct product_name from product_information p join order_items o
+on p.product_id = o.product_id
+order by product_name;
+
+-- STEP 1 - SP
+set serveroutput on
+declare
+    type t_prod is table of varchar2(50);
+    v_prod t_prod;
+begin
+    select distinct product_name bulk collect into v_prod
+    from product_information p join order_items o
+    on p.product_id = o.product_id
+    order by product_name;
+    DBMS_OUTPUT.PUT_LINE(v_prod.count);
+end;
+/
+
+-- STEP 2 - SP
+set serveroutput on
+declare
+    type t_prod is table of varchar2(50);
+    v_prod t_prod;
+begin
+    select distinct product_name bulk collect into v_prod
+    from product_information p join order_items o
+    on p.product_id = o.product_id
+    order by product_name;
+    DBMS_OUTPUT.PUT_LINE(sql%rowcount);
+end;
+/
+
+-- STEP 3 - display product name
+set serveroutput on
+declare
+    type t_prod is table of varchar2(50);
+    v_prod t_prod;
+begin
+    select distinct product_name bulk collect into v_prod
+    from product_information p join order_items o
+    on p.product_id = o.product_id
+    order by product_name;
+    for i in 1..v_prod.count loop
+        DBMS_OUTPUT.PUT_LINE(i || '->' || v_prod(i));
+    end loop;
+end;
+/
+
+-- STEP 4 - with cursor
+set serveroutput on
+declare
+    cursor c is select distinct product_name
+    from product_information p join order_items o
+    on p.product_id = o.product_id
+    order by product_name;
+    r varchar2(50);
+begin
+    if not c%isopen then
+        open c;
+    end if;
+    loop
+        fetch c into r;
+        dbms_output.put_line(c%rowcount || '->'|| r);
+        exit when c%notfound;
+    end loop;
+    close c;
+end;
+/
+
+-- display the product name and the list_price
+set serveroutput on
+declare
+    cursor c is select distinct product_name, list_price
+    from product_information p join order_items o
+    on p.product_id = o.product_id
+    order by product_name;
+    r c%rowtype;
+begin
+    if not c%isopen then
+        open c;
+    end if;
+    loop
+        fetch c into r;
+        dbms_output.put_line(c%rowcount || '->'|| r.product_name || '-'|| r.list_price);
+        exit when c%notfound;
+    end loop;
+    close c;
+end;
+/
+
+--3. Get top 10 products according to mean price
+set serveroutput on
+declare
+    cursor c is select distinct product_name, (list_price + min_price)/2 mean_price
+    from product_information p join order_items o
+    on p.product_id = o.product_id
+    order by mean_price desc;
+    r c%rowtype;
+    
+begin
+    if not c%isopen then
+        open c;
+    end if;
+    
+    loop
+    fetch c into r;
+    DBMS_OUTPUT.PUT_LINE(c%rowcount || '=>' || r.product_name || ' has the price ' || r.mean_price);
+    exit when c%notfound or c%rowcount > 9;
+    end loop;
+    close c;
+end;
+/
+
+-- Do the same but with for loop
+
+set serveroutput on
+declare
+    cursor c is select distinct product_name, (list_price + min_price)/2 mean_price
+    from product_information p join order_items o
+    on p.product_id = o.product_id
+    order by mean_price desc;
+    
+begin
+    for r in c loop
+     exit when c%notfound or c%rowcount > 10;
+        DBMS_OUTPUT.PUT_LINE(c%rowcount || '=>' || r.product_name || ' has the price ' || r.mean_price);
+    end loop;
+end;
+/
+
+-- INLINE CURSOR
+set serveroutput on
+declare
+    i pls_integer := 0;
+begin
+    for r in (select distinct product_name, (list_price + min_price)/2 mean_price
+            from product_information p join order_items o
+            on p.product_id = o.product_id
+            order by mean_price desc)
+    loop
+        i := i+1;
+        exit when i=10;
+        DBMS_OUTPUT.PUT_LINE(i || '=>' || r.product_name || ' has the price ' || r.mean_price);
+    end loop;
+end;
+/
+
+-- inline cursor doesn't have attribues
+-- i can't open/close the cursor (it's already opened in the for statement)
+-- it's declared automatically the c%rowtype in the for loop
+-- fetching data is automatically done.
+
+SEMINAR 6 – Continue with cursor exercises
+Explicit cursor : 
+1.loop, fetch 
+2.for, inline cursor
+3.cursors with parameters (today)
+4.cursors with for update (today)
+
+--1) Display the department names of the departments which have employees. Under each department display the names of the employees from that department.
+--1st write the sql (departments, employees tables)
+
+select department_name from departments d 
+join employees e on d.department_id=e.department_id;
+
+select department_name from departments d 
+join employees e on d.department_id=e.department_id group by department_name;
+
+--using a subquery instead of a join
+select department_name from departments d where d.department_id in 
+(select department_id from employees);
+
+select distinct d.department_name, d.department_id from departments d 
+join employees e on d.department_id=e.department_id
+order by department_id;
+
+select first_name, last_name from employees where department_id = 10;
+select first_name, last_name from employees where department_id = 20;
+select first_name, last_name from employees where department_id = 30;
+
+Expected Output:
+Administration	
+    Jennifer Whalen
+Marketing	
+    Michael	Hartstein
+    Pat	Fay
+Purchasing
+    Den	Raphaely
+    Alexander Khoo
+    Shelli Baida
+    Sigal Tobias
+    Guy	Himuro
+    Karen Colmenares
+
+--2nd pl/sql
+set serveroutput on
+declare 
+    cursor d is select distinct d.department_name, d.department_id 
+    from departments d join employees e on d.department_id=e.department_id
+    order by department_id;
+    
+    cursor e(p_id number) is select first_name, last_name --it won't work number(3)
+    from employees where department_id = p_id;
+begin
+    for r1 in d loop
+        dbms_output.put_line(r1.department_name);
+    end loop;
+end;
+/
+
+--2nd loop that will display the employees of each department
+set serveroutput on
+declare 
+    cursor d is select distinct d.department_name, d.department_id 
+    from departments d join employees e on d.department_id=e.department_id
+    order by department_id;
+    
+    cursor e(p_id number) is select first_name, last_name 
+    from employees where department_id = p_id;
+begin
+    for r1 in d loop
+        dbms_output.put_line(r1.department_name || ':');
+        for r2 in e(r1.department_id) loop
+            dbms_output.put_line('      - ' || r2.first_name || ' ' || r2.last_name);
+        end loop;
+    end loop;
+end;
+/
+
+-- Display the total nb of employees per department and in the end the total number of emp 
+
+Example output:
+
+Administration	
+    Jennifer Whalen
+Number of employees: 1
+Marketing	
+    Michael	Hartstein
+    Pat	Fay
+Number of employees: 2
+Total number of employees: n (at the end)
+
+set serveroutput on
+declare 
+    cursor d is select distinct d.department_name, d.department_id 
+    from departments d join employees e on d.department_id=e.department_id
+    order by department_id;
+    
+    cursor e(p_id number) is select first_name, last_name 
+    from employees where department_id = p_id;
+    
+    emp number := 0;
+    total number := 0;
+begin
+    for r1 in d loop
+        dbms_output.put_line(r1.department_name || ':');
+        emp := 0;
+        for r2 in e(r1.department_id) loop 
+            dbms_output.put_line('      - ' || r2.first_name || ' ' || r2.last_name);
+            emp := emp + 1;
+        end loop;
+        total := total + emp;
+        dbms_output.put_line(' Employees: ' || emp);
+        dbms_output.put_line('');
+    end loop;
+    dbms_output.put_line('Total Employees: ' || total);
+end;
+/
+
+
+--another way to do : to add a count in the select
+set serveroutput on
+declare 
+    cursor d is select d.department_name, d.department_id, count(*) nb
+    from departments d join employees e on d.department_id=e.department_id
+    group by department_name, d.department_id
+    order by department_id;
+    
+    cursor e(p_id number) is select first_name, last_name 
+    from employees where department_id = p_id;
+    
+    total number := 0;
+begin
+    for r1 in d loop
+        dbms_output.put_line(r1.department_name || ':');
+        for r2 in e(r1.department_id) loop 
+            dbms_output.put_line('      - ' || r2.first_name || ' ' || r2.last_name);
+        end loop;
+        total := total + 1;
+        dbms_output.put_line(' Employees: ' || r1.nb);
+        dbms_output.put_line('');
+    end loop;
+    dbms_output.put_line('Total Employees: ' || total);
+end;
+/
+
+--without parameter
+set serveroutput on
+declare 
+    cursor d is select d.department_name, d.department_id, count(*) nb
+    from departments d join employees e on d.department_id=e.department_id
+    group by department_name, d.department_id
+    order by department_id;
+    
+    cursor e is select first_name, last_name, department_id 
+    from employees;
+    
+    total number := 0;
+begin
+    for r1 in d loop
+        dbms_output.put_line(r1.department_name || ':');
+        for r2 in e loop 
+            continue when r1.department_id <> r2.department_id; -- <> different
+            dbms_output.put_line('      - ' || r2.first_name || ' ' || r2.last_name);
+        end loop;
+        total := total + 1;
+        dbms_output.put_line(' Employees: ' || r1.nb);
+        dbms_output.put_line('');
+    end loop;
+    dbms_output.put_line('Total Employees: ' || total);
+end;
+/
+--it s not a good approach - everytime the cursor will be open when the comdition if verify when we are saying continue
+--To improve this we can use inline cursor
+set serveroutput on
+declare 
+    cursor d is select d.department_name, d.department_id, count(*) nb
+    from departments d join employees e on d.department_id=e.department_id
+    group by department_name, d.department_id
+    order by department_id;
+    
+    total number := 0;
+begin
+    for r1 in d loop
+        dbms_output.put_line(r1.department_name || ':');
+        for r2 in (select first_name, last_name, department_id 
+                   from employees where department_id = r1.department_id) 
+        loop 
+            dbms_output.put_line('      - ' || r2.first_name || ' ' || r2.last_name);
+        end loop;
+        total := total + 1;
+        dbms_output.put_line(' Employees: ' || r1.nb);
+        dbms_output.put_line('');
+    end loop;
+    dbms_output.put_line('Total Employees: ' || total);
+end;
+/
+
+-- cursor with for update
+-- 1st – SP without for update to raise the salary
+set serveroutput on
+declare
+    cursor c is select employee_id, salary 
+    from employees where department_id = 50;
+    sal_before number;
+    sal_after number;
+begin
+    select sum(salary) into sal_before from employees where department_id = 50;
+    for r in c loop
+        update employees set salary = salary * 1.05 --5%
+        where employee_id = r.employee_id;
+
+    end loop;
+    select sum(salary) into sal_after from employees where department_id = 50;
+    dbms_output.put_line(sal_before || '->' || sal_after);
+    rollback; --not mandatory
+end;
+/
+--with for update=lock the rows exclusevely for the loop block - ensureing if the rows are available during the process (like Thread safe from java)
+set serveroutput on
+declare
+    cursor c is select employee_id, salary 
+    from employees where department_id = 50 for update;
+    sal_before number;
+    sal_after number;
+begin
+    select sum(salary) into sal_before from employees where department_id = 50;
+    for r in c loop -- the rows from the cursor are locked for the update until the cursor is closed
+        update employees set salary = salary * 1.05 --5%
+        where current of c; -- update for the current row from the cursor
+    end loop; -- the locks are released
+    select sum(salary) into sal_after from employees where department_id = 50;
+    dbms_output.put_line(sal_before || '->' || sal_after);
+    rollback; --not mandatory
+end;
+/
+
+for update Nowait , wait 5 sec
+
+SEMINAR 8 - user-defined exceptions
+DECLARE 
+Exception_name EXCEPTION;
+�
+BEGIN
+�
+RAISE exception_name;
+�.
+EXCEPTION
+WHEN exception_name THEN statements;
+END;
+
+1)	Raise an error if the user tries to execute the PL/SQL block before 5 o�clock pm. 
+--STEP 1
+DECLARE
+    e_exc1 EXCEPTION;
+BEGIN
+    IF TO_NUMBER(TO_CHAR(SYSDATE, 'HH24'))<=17 THEN
+    RAISE e_exc1;
+END IF;
+EXCEPTION
+WHEN e_exc1 THEN
+    dbms_output.put_line('It is '||TO_CHAR(SYSDATE, 'HH24'));
+    dbms_output.put_line('Operation not yet allowed');
+END;
+
+-- STEP 2 (User-defined exceptions can also be handled as Oracle exceptions, by giving them error codes and error messages. In this case, the error code can have values between  -20999 and -20000. )
+DECLARE
+    e_exc1 EXCEPTION;
+PRAGMA EXCEPTION_INIT(e_exc1, -20600);
+BEGIN
+IF TO_NUMBER(TO_CHAR(SYSDATE, 'HH24'))<=17 THEN
+    RAISE_application_error(-20600,'error message');
+END IF;
+EXCEPTION
+WHEN e_exc1 THEN
+    dbms_output.put_line('It is '||TO_CHAR(SYSDATE, 'HH24'));
+    dbms_output.put_line('Operation not yet allowed');
+    dbms_output.put_line(sqlerrm);
+END;
+
+
+PL/SQL SUBPROGRAMS
+-Procedures and functions-
+
+Subprogram = a set of statements seen as a unit which has a name and makes a certain processing.
+The subprogram is called from another program or subprogram, written in PL/SQL or in an universal programming language.
+
+When defining the subprogram the following elements have to be described:
+o	The header (contains the type of the subprogram, its name, the parameters)
+o	The body (contains a set of statements)
+o	 The end (an instruction that is meant to exit the subprogram and return to the main program)
+
+The formal parameters can be:
+�	IN (the value of the actual parameter is transferred in the variable that is defined in the procedure. This variable is read-only.) The actual parameter never modifies. It is the default type; 
+�	OUT (the value of the formal parameter is transferred in the actual parameter when the subprogram ends);
+�	IN OUT (the values are transferred from one type of variable to the other, when executing/ending the subprogram). 
+
+Display 1st 3 products by a category given, orderd by list price
+
+create or replace procedure display_categ(categ varchar2) is 
+cursor c is select product_name from product_information 
+where category_id=categ and list_price is not null
+order by list_price desc;
+begin
+ for r in c loop
+ exit when c%rowcount>3;
+ dbms_output.put_line(r.product_name);
+ end loop;
+end;
+/ 
+
+begin
+display_categ(15); --hardware
+end;
+/
+
+Procedure with IN parameters
+1) Create a procedure that modifies the salary of an employee whose id is given as parameter. Also the percentage of salary growth is given as a parameter. 
+
+CREATE OR REPLACE PROCEDURE 
+modify_salary(v_employee_id IN number, percent number)
+IS v_salary number;
+BEGIN
+    select salary into v_salary from employees where employee_id = v_employee_id;
+    dbms_output.put_line('The employee has the salary:'||v_salary);
+    update employees
+    set salary=salary*(1+percent/100)
+    where employee_id=v_employee_id;
+    select salary into v_salary from employees where employee_id=v_employee_id;
+    dbms_output.put_line('The employee has the salary:'||v_salary);
+END;
+/
+show errors;
+--The possible calls:
+set serveroutput on
+CALL modify_salary(176, 10);
+--or
+EXECUTE modify_salary(176, 10);
+--or (equivalent with the previous call)
+begin
+modify_salary(176, 10);
+end;
+
+
+Procedure with OUT parametres
+2) Create a procedure that returns the name and the salary of an employee whose id is given. 
+CREATE OR REPLACE PROCEDURE 
+proc_employee(p_employee_id IN number, 
+              p_name OUT varchar2, 
+              p_salary OUT number)
+IS
+BEGIN
+    select first_name,salary into p_name, p_salary from employees 
+    where employee_id = p_employee_id;
+END;
+
+--The call:
+DECLARE
+    v_name varchar2(50); 
+    v_salary number;
+BEGIN
+    proc_employee(150, v_name, v_salary);
+    dbms_output.put_line('The employee '||v_name||' has the salary: '||v_salary);
+END;
+
+EXERCITIU
+-- 2.1) Create a procedure that calculates the average salary and returns it. Use a host variable. 
+CREATE or REPLACE PROCEDURE 
+avg_sal(p_avg OUT number)
+IS
+BEGIN
+    select AVG(salary) into p_avg from employees;
+END;
+
+--The call: 
+declare v_sal NUMBER;
+begin 
+    avg_sal(v_sal);
+    dbms_output.put_line('Salary: ' || v_sal);
+end;
+
+
+EXERCITIU -
+-- 2.2) Write a SP that display for a specific employee his name, hire date and seniority
+
+create or replace procedure 
+search_employee(p_id number, p_name out varchar2, p_seniority out number)
+is
+begin
+    select first_name, round((sysdate-hire_date)/365,0) into p_name, p_seniority from employees 
+    where employee_id = p_id;
+end;
+/
+
+declare
+v_name varchar2(50);
+v_seniority number;
+begin
+    search_employee(100, v_name, v_seniority);
+    dbms_output.put_line('Employee ' || v_name || ' has a seniority of ' || v_seniority || ' yrs');
+end;
+/
+
+Procedure with IN OUT parameters
+
+3) Create a procedure that modifies the salary of all employees if their salary is smaller than the average salary. The procedure receives the average salary and returns it after the updates have been made. It calls the modify_salary procedure and uses 15 for the percentage.
+
+CREATE or REPLACE PROCEDURE 
+modify_avg_salary(avg_salary IN OUT number)
+IS
+cursor c is select employee_id, salary from employees where salary < avg_salary;
+begin
+    for var in c loop
+        modify_salary(var.employee_id,15);
+    end loop;
+    select avg(salary) into avg_salary from employees;
+end;
+
+--The call:
+DECLARE
+    v_avg_salary number;
+BEGIN
+    select avg(salary) into v_avg_salary from employees;
+    dbms_output.put_line('The initial average salary: '||round(v_avg_salary));
+    modify_avg_salary(v_avg_salary);
+    dbms_output.put_line('The final average salary: '||round(v_avg_salary));
+end;
+
+
+Packages of subprograms
+A package can contain:
+ - functions
+ - subprograms
+ - variables
+ - cursors
+ - exceptions
+ - so on
+ 
+ structure:
+ --header
+ create or replace package name_package is
+ - functions
+ - subprograms
+ - variables
+ - cursors
+ - exceptions
+ - so on
+
+ end;
+ 
+ --body 
+ create or replace package body name_package is
+    --explicit functions, subprograms, etc.
+ end;
+ 
+ 
+ --1. Create a packege of functions and subprograms for employee management, that will do:
+  --  a function search a emplyee by id -> name of the emp
+  --  a function search a emplyee by name and department -> salary
+  --  a function calculate the income of an employee by an employee id -> income
+  --  a function calculate the income by a specific salary and commission
+  --  a subprogram that will calculate  the total income by department -> nb employees, total income
+  --  variable for total income by sum of dep 
+  
+  set serveroutput on
+  create or replace package p_employee_management is
+  function search_employee(p_employee_id employees.employee_id%type) return employees.first_name%type;
+  function search_employee(p_first_name employees.first_name%type, p_dep_id departments.department_id%type)
+  return number;
+  function income_employee(p_employee_id employees.employee_id%type) return number;
+  function income_employee(p_salary employees.salary%type, p_com employees.commission_pct%type) return number;
+  procedure calc_income_dep(p_department_id departments.department_id%type, 
+                            nb_employees out number, total_income out number);
+  v_total_salaries number;
+  end;
+  /
+  
+  
+  create or replace package body p_employee_management is
+  
+  function search_employee(p_employee_id employees.employee_id%type) return employees.first_name%type is
+  v_first_name employees.first_name%type;
+  begin
+    select first_name into v_first_name from employees where employee_id = p_employee_id;
+    return v_first_name;
+    exception
+    when no_data_found then
+        return null;
+    when too_many_rows then
+        v_first_name := 'Too many employees!';
+        return v_first_name;
+  end search_employee;
+  
+  function search_employee(p_first_name employees.first_name%type, p_dep_id departments.department_id%type)
+  return number is
+  v_sal number;
+  begin
+    select salary into v_sal from employees where first_name = p_first_name and department_id = p_dep_id;
+    return v_sal;
+    exception
+    when no_data_found or too_many_rows then
+        return null;
+  end search_employee;
+  
+  function income_employee(p_employee_id employees.employee_id%type) return number is
+  v_com employees.commission_pct%type;
+  v_sal number;
+  begin
+    select salary, commission_pct into v_sal, v_com from employees where employee_id = p_employee_id;
+    return v_sal * (1 + nvl(v_com, 0)); -- nvl -> it will put a value everywhere where is null
+    exception
+    when no_data_found then
+        return null;
+  end income_employee;
+  
+  function income_employee(p_salary employees.salary%type, p_com employees.commission_pct%type) return number is
+  begin
+    return p_salary * (1 + nvl(p_com, 0));
+  end income_employee;
+  
+  procedure calc_income_dep(p_department_id departments.department_id%type, 
+                            nb_employees out number, total_income out number) is
+  begin 
+    select count(employee_id), sum(income_employee(salary, commission_pct)) into nb_employees, total_income
+    from employees where department_id = p_department_id;
+    
+    v_total_salaries := v_total_salaries + total_income;
+    
+    exception
+        when no_data_found then
+        dbms_output.put_line('It doesn''t exist a department with this ID!');
+  end calc_income_dep;
+  
+  begin
+    v_total_salaries := 0;
+  end;
+  /
+  
+ -- call the package
+ declare
+    v_sal number;
+    v_nb number;
+    v_sal_tot number;
+    v_first_name varchar2(50);
+ begin
+    v_first_name := p_employee_management.search_employee(101);
+    dbms_output.put_line('The name of the employee with the id 101 is ' || v_first_name);
+    
+    v_sal := p_employee_management.search_employee('King', 90);
+    dbms_output.put_line('The King salary is ' || v_sal);
+    
+    p_employee_management.v_total_salaries := 0;
+    dbms_output.put_line('The department salary ' || p_employee_management.v_total_salaries);
+    
+    p_employee_management.calc_income_dep(90, v_nb, v_sal_tot);
+    dbms_output.put_line('In the dep with id=90 are ' || v_nb || ' employees that have salary of ' || v_sal_tot);
+    dbms_output.put_line('The salary of departments is ' || p_employee_management.v_total_salaries);
+
+    p_employee_management.calc_income_dep(110, v_nb, v_sal_tot);
+    dbms_output.put_line('In the dep with id=110 are ' || v_nb || ' employees that have salary of ' || v_sal_tot);
+    dbms_output.put_line('The salary of departments is ' || p_employee_management.v_total_salaries);
+
+    p_employee_management.calc_income_dep(50, v_nb, v_sal_tot);
+    dbms_output.put_line('In the dep with id=50 are ' || v_nb || ' employees that have salary of ' || v_sal_tot);
+    dbms_output.put_line('The salary of departments is ' || p_employee_management.v_total_salaries);
+
+ end;
+ /
+ 
+ TRIGGERS
+ - the triggers are created on tables or DB
+ 
+ Strcuture
+ create or replace trigger name_tr
+ before / after / instead of
+ inset/ update / delete
+ on table name_table
+ for each row
+ when condition
+    body_trigger;
+    
+--avoid delete departments
+create or replace trigger t_delete_dep
+before delete on departments
+begin
+    raise_application_error(-20000, 'You can''t delete data!');
+end;
+/
+
+delete from departments where department_id = 90;
+
+ --disable trigger
+ alter trigger t_delete_dep disable;
+ --enagle trigger
+alter trigger t_delete_dep enable;
+
+ --select trigger
+ select * from user_triggers where table_name = 'DEPARTMENTS';
+ 
+ 
+ 
+SELECT * FROM USER_TABLES;
+
+SQL (STRUCTURED QUERY LANGUAGE)
+4GL
+TABLES: COLUMNS, ROWS (DATA) AND THE CONSTRAINTS:
+            PRIMARY KEY (SIMPLE, COMPOSED) + UNIQUE + NOT NULL, WE CAN ONLY HAVE 1 PK
+            UNIQUE 
+            FOREIGN KEY
+            CHECK
+            NOT NULL (INLINE ONLY)
+VIEWS: REFERENCE DATA FROM BASE TABLES, DOESN'T CONTAIN DATA         
+SYNONYMS: USUALLY FOR OBJECTS IN OTHER SCHEMAS
+SEQUENCES: GENERATE UNIQUE VALUES FOR NUMERIC PK
+
+SELECT * FROM USER_VIEWS;
+            
+SELECT * FROM EMPLOYEES;  
+
+CREATE OR REPLACE VIEW V_EMPLOYEES AS SELECT EMPLOYEE_ID SALES_REP_ID,FIRST_NAME,LAST_NAME,EMAIL 
+FROM EMPLOYEES
+   WHERE SALARY<10000 ORDER BY 1;
+   
+SELECT * FROM  V_EMPLOYEES NATURAL JOIN ORDERS; --BAD IDEEA -> CROSS JOIN
+SELECT * FROM  V_EMPLOYEES E JOIN ORDERS O ON E.SALES_REP_ID=O.SALES_REP_ID;
+
+REVOKE SELECT ON V_EMPLOYEES FROM PUBLIC;
+
+SELECT USER FROM DUAL;
+
+SELECT * FROM VLAD_ENG.V_EMPLOYEES;
+
+CREATE SYNONYM V_EMP FOR VLAD_ENG.V_EMPLOYEES;
+
+SELECT * FROM V_EMP WHERE LAST_NAME LIKE 'F%';
+
+SELECT * FROM DEPARTMENTS;
+
+UPDATE EMPLOYEES SET DEPARTMENT_ID=500 WHERE EMPLOYEE_ID=198;
+
+DROP TABLE EMP;
+CREATE TABLE EMP(
+EMP_ID NUMBER,
+FIRST_NAME VARCHAR2(50) NOT NULL,
+LAST_NAME VARCHAR2(50) NOT NULL,
+SALARY NUMBER,
+CONSTRAINT EMP_PK PRIMARY KEY(EMP_ID),
+CONSTRAINT EMP_SAL_NN CHECK(SALARY IS NOT NULL));
+
+DESC EMP;
+
+INSERT INTO EMP VALUES(EMP_ID_S.NEXTVAL,'JOHN','DOE '||EMP_ID_S.CURRVAL,1000);
+SELECT * FROM EMP;
+CREATE SEQUENCE EMP_ID_S START WITH 1 NOCACHE; -- 38 DIGITS
+SELECT EMP_ID_S.NEXTVAL,EMP_ID_S.CURRVAL FROM DUAL;
+SELECT EMP_ID_S.CURRVAL FROM DUAL;
+
+ALTER TABLE EMP MODIFY EMP_ID DEFAULT EMP_ID_S.NEXTVAL;
+
+INSERT INTO EMP(FIRST_NAME,LAST_NAME,SALARY) VALUES('JOHN','DOE '||EMP_ID_S.CURRVAL,1000);
+SELECT * FROM EMP;
+COMMIT; -- ROLLBACK
+
+PL/SQL (PROCEDURAL LANGUAGE ...)
+- PROCEDURAL EXTENSION TO SQL
+- 3GL LANGUAGE
+
+STORED SUBPROGRAMS: FUNCTIONS + PROCEDURES
+PACKAGES
+TRIGGERS
+ANONYMOUS BLOCK
+
+DECLARE 
+  -- VARIABLES, CONSTANTS, CURSORS, EXCEPTIONS ...
+  -- OPTIONAL
+BEGIN
+   -- MANDATORY
+   -- ANY PLSQL BLOCK MUST HAVE AT LEAST ONE EXECUTABLE STATEMENT
+   
+   IF () ... THEN 
+                BEGIN
+                
+                EXCEPTION
+                 
+                END;
+   
+   EXCEPTION
+   -- OPTINAL
+END;
+/
+
+BEGIN
+  NULL;
+END;
+/
+
+BEGIN
+  NULL;
+END;  
+/
+
+
+SET SERVEROUTPUT ON
+--ONCE PER SESSION
+DECLARE
+
+  V_FIRST_NAME VARCHAR2(50);
+  V_LAST_NAME VARCHAR2(50);
+  V_FIRST_NAME2 VARCHAR2(3);
+  n number:=10;
+BEGIN
+  n:=n/0;
+  SELECT FIRST_NAME,LAST_NAME INTO V_FIRST_NAME,V_LAST_NAME FROM EMPLOYEES WHERE EMPLOYEE_ID
+   in (101);
+  V_FIRST_NAME2:=V_FIRST_NAME;
+  DBMS_OUTPUT.PUT_LINE(UPPER('HELLO '||V_FIRST_NAME2||' '||V_LAST_NAME));
+  --SYS.OUT.PRINTLN
+  exception 
+   
+  when TOO_MANY_ROWS then
+    DBMS_OUTPUT.PUT_LINE('More than one row was returned');
+    DBMS_OUTPUT.PUT_LINE('The error was: '||SQLERRM);
+    -- we can''t return to the main block
+  when NO_DATA_FOUND then
+    DBMS_OUTPUT.PUT_LINE('No row was returned');
+    DBMS_OUTPUT.PUT_LINE('The error was: '||SQLCODE); 
+ when OTHERS then
+    DBMS_OUTPUT.PUT_LINE('Another exception was raised '||SQLERRM);
+    DBMS_OUTPUT.PUT_LINE('Error code: '||SQLCODE);
+END;
+/
+-- we continue at 10:30
+
+/*Fundamental control structures
+Sequential structure
+Decisional structure: IF THEN ELSE, CASE
+Iterative structure (loop): 
+                * known number of steps: FOR
+                * unkown number of steps: LOOP, WHILE*//*
+
+set SERVEROUTPUT ON
+declare
+  v_grade number:=10;
+begin
+  -- 3VL: true, false, null
+  if v_grade is null then
+   dbms_output.put_line('No grade was provided!');
+  elsif v_grade<1 or v_grade>10 or v_grade!=trunc(v_grade) then
+    dbms_output.put_line('Wrong grade!');
+  elsif v_grade<5 then
+    dbms_output.put_line('Failed!');
+  else
+    dbms_output.put_line('Passed!');
+ 
+  end if;
+end;
+/
+
+declare
+  v_grade number:=10;
+begin
+  -- 3VL: true, false, null
+  -- searched case statement
+  case
+  when v_grade is null then
+   dbms_output.put_line('No grade was provided!');
+   dbms_output.put_line('No grade was provided 2!');
+  when v_grade<1 or v_grade>10 or v_grade!=trunc(v_grade) then
+    dbms_output.put_line('Wrong grade!');
+  when v_grade<5 then
+    dbms_output.put_line('Failed!');
+  else
+    dbms_output.put_line('Passed!');
+ 
+  end case;
+end;
+/
+
+
+declare
+  v_grade number:=10;
+  v_message varchar2(100); -- similar to the case from SQL (case expression)
+begin
+  -- 3VL: true, false, null
+  -- case expression
+  v_message:=case
+  when v_grade is null then
+   'No grade was provided!'
+  when v_grade<1 or v_grade>10 or v_grade!=trunc(v_grade) then
+   'Wrong grade!'
+  when v_grade<5 then
+   'Failed!'
+  else
+    'Passed!'
+ 
+  end;
+  dbms_output.put_line(v_message);
+end;
+/
+
+
+declare
+  v_day number:=2;
+  v_day_week varchar2(20);
+  -- value match case
+begin
+   case v_day
+    when 1 then 
+      dbms_output.put_line('It''s Monday!');
+    when 2 then
+       dbms_output.put_line('It''s Tuesday!');
+     when 3 then
+       dbms_output.put_line('It''s Wednesday!');
+       
+      when 4 then
+       dbms_output.put_line('It''s Thursday!');
+      when 5 then
+       dbms_output.put_line('It''s Friday!');
+        when 6 then
+       dbms_output.put_line('It''s Saturday!');
+       when 7 then
+       dbms_output.put_line('It''s Sunday!');
+       else
+        dbms_output.put_line('Unkown');
+    end case;    
+end;
+/  
+
+select to_char(sysdate,'day') from dual;
+
+set SERVEROUTPUT ON
+declare 
+  i number default 50;
+begin
+  i:=51;
+  dbms_output.put_line('initial i='||i);
+  for i in 100..120 loop
+    dbms_output.put_line('i='||i);
+  --i:=i+1;
+  end loop;  
+  dbms_output.put_line('final i='||i);
+end;
+/
+
+declare
+  s varchar2(50) default '498732ssa*9058ss30328';
+  sum_digits number := 0; -- if it is not initialized, the value is null
+begin
+  for i in 1..length(s) loop
+  
+    if substr(s,i,1) in ('1','2','3','4','5','6','7','8','9')  then
+     sum_digits:=sum_digits + substr(s,i,1);
+    end if; 
+    sum_digits:=sum_digits+0;
+  end loop;
+  dbms_output.put_line('Sum of digits: '||sum_digits);
+  
+   -- if 's' in ('1','2','3','4','5','6','7','8','9')
+  
+ /* if sum_digits=63 then
+    dbms_output.put_line('Spot on!');
+  end if;*/  
+/*
+end;
+/
+
+
+select 0+4+9+8 from dual;
+
+
+declare
+  s varchar2(50) default '498732ssa*9058ss30328';
+  sum_digits number := 0; -- if it is not initialized, the value is null
+begin
+ 
+  for i in 1..length(s) loop
+  -- embedded plsql blocks
+   begin
+     
+     sum_digits:=sum_digits + substr(s,i,1);
+     sum_digits:=9/0;
+  exception 
+   when zero_divide then
+     dbms_output.put_line('I divided by zero 1!->'||substr(s,i,1));
+       when others then 
+       dbms_output.put_line('I can''t add '||substr(s,i,1));
+   end;    
+  end loop;
+  dbms_output.put_line('Sum of digits: '||sum_digits);
+  sum_digits:=9/0;
+  exception
+   when zero_divide then
+     dbms_output.put_line('I divided by zero 2!');
+end;
+/
+
+declare
+  cnp varchar2(13):='6000124133797';
+  const varchar2(12):='279146358279'; 
+  sum_d number := 0;
+  r number:=0;
+  -- let's validate the CNP
+  -- we can use single row SQL functions in PL/SQL statemenents (except decode)
+begin
+  if length(cnp)!=13 then
+    dbms_output.put_line('The cnp doesn''t have 13 digits');
+  else
+    for i in 1..12 loop
+      sum_d:=sum_d+(substr(cnp,i,1)*substr(const,i,1));
+    end loop;
+  end if;  
+  dbms_output.put_line('The sum='||sum_d);
+  r:=sum_d mod 11;
+  --r:=mod(sum_d,11);
+  dbms_output.put_line('The remainder='||r);
+ -- dac� restul �mp�r?irii este mai mic de 10, acela reprezint� valoarea componentei�C
+-- dac� restul �mp�r?irii este 10, valoarea componentei�C�este 1
+  if (r=substr(cnp,13,1) or (r=10 and substr(cnp,13,1)=1)) then
+     dbms_output.put_line('The cnp is correct');
+  else
+     dbms_output.put_line('The cnp is wrong');
+  end if;
+end;
+/
+
+-- exercise: starting from the cnp extract the birth date and calculate the age
+
+set serveroutput on
+declare
+  cnp varchar2(13):='6000124133797';
+  const varchar2(12):='279146358279'; 
+  sum_d number := 0;
+  r number:=0;
+  dob date;
+  age number;
+ 
+begin
+  if length(cnp)!=13 then
+    dbms_output.put_line('The cnp doesn''t have 13 digits');
+  else
+    for i in 1..12 loop
+      sum_d:=sum_d+(substr(cnp,i,1)*substr(const,i,1));
+    end loop;
+  end if;  
+  dbms_output.put_line('The sum='||sum_d);
+  r:=sum_d mod 11;
+  --r:=mod(sum_d,11);
+  dbms_output.put_line('The remainder='||r);
+
+  if (r=substr(cnp,13,1) or (r=10 and substr(cnp,13,1)=1)) then
+     dbms_output.put_line('The cnp is correct');
+  else
+     dbms_output.put_line('The cnp is wrong');
+  end if;
+      -- '6000124133797'  ,     '2871106363938'
+  dob := to_date(substr(cnp,2,6),'rrmmdd');
+  dbms_output.put_line('Date of birth: '||to_char(dob,'dd.mm.yyyy'));
+  age:=trunc(months_between(sysdate,dob)/12);
+  dbms_output.put_line('The age is: '||age);
+end;
+/
+
+-- exercise: starting from the cnp extract the birth date and calculate the age
+
+select to_date('000124','rrmmdd') from dual;
+
+select round(7.589048534) from dual;
+
+-- 00..49 to be in the current century
+-- 50..99 to in the previous century
+
+/*Data types:
+
+Scalar types
+    SQL: number, varchar2, char, date, timestamp...
+    PL/SQL: boolean, pls_integer
+Composite types
+    Record: user defined, %ROWTYPE
+    Collections: index-by-tables, nested-tables, varrays (variable size arrays)
+ */   
+    /*
+DESC EMPLOYEES;    
+DECLARE
+  -- PROGRAMMER DEFINED RECORD
+  TYPE T_EMP IS RECORD(
+  FN EMPLOYEES.FIRST_NAME%TYPE,
+  LN EMPLOYEES.LAST_NAME%TYPE,
+  SAL EMPLOYEES.SALARY%TYPE);
+  EMP T_EMP; -- EMP IS A VARIABLE OF T_EMP TYPE
+   -- INSTEAD OF USING 3 SCALAR VARIABLES I AM USING ONE RECORD VARIABLE
+  n number:=10;
+BEGIN
+  
+  SELECT FIRST_NAME,LAST_NAME,SALARY INTO EMP FROM EMPLOYEES 
+  WHERE EMPLOYEE_ID in (101);
+ 
+  DBMS_OUTPUT.PUT_LINE(UPPER(EMP.FN||' '||EMP.LN||
+       ' HAS A SALARY OF '||EMP.SAL));
+  --SYS.OUT.PRINTLN
+  exception 
+   
+  when TOO_MANY_ROWS then
+    DBMS_OUTPUT.PUT_LINE('More than one row was returned');
+    DBMS_OUTPUT.PUT_LINE('The error was: '||SQLERRM);
+    -- we can''t return to the main block
+  when NO_DATA_FOUND then
+    DBMS_OUTPUT.PUT_LINE('No row was returned');
+    DBMS_OUTPUT.PUT_LINE('The error was: '||SQLCODE); 
+ when OTHERS then
+    DBMS_OUTPUT.PUT_LINE('Another exception was raised '||SQLERRM);
+    DBMS_OUTPUT.PUT_LINE('Error code: '||SQLCODE);
+END;
+/
+
+
+DECLARE
+  
+  EMP EMPLOYEES%ROWTYPE; -- EMP IS A VARIABLE HAVING THE SAME STRUCTURE AS A RECORD FROM EMPLOYEES
+   
+  n number:=10;
+BEGIN
+  
+ -- SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID INTO EMP FROM EMPLOYEES 
+ -- WHERE EMPLOYEE_ID in (101);
+   -- OR:
+  SELECT * INTO EMP FROM EMPLOYEES 
+  WHERE EMPLOYEE_ID in (101);
+ 
+  DBMS_OUTPUT.PUT_LINE(UPPER(EMP.FIRST_NAME||' '||EMP.LAST_NAME||
+       ' HAS A SALARY OF '||EMP.SALARY));
+  --SYS.OUT.PRINTLN
+  exception 
+   
+  when TOO_MANY_ROWS then
+    DBMS_OUTPUT.PUT_LINE('More than one row was returned');
+    DBMS_OUTPUT.PUT_LINE('The error was: '||SQLERRM);
+    -- we can''t return to the main block
+  when NO_DATA_FOUND then
+    DBMS_OUTPUT.PUT_LINE('No row was returned');
+    DBMS_OUTPUT.PUT_LINE('The error was: '||SQLCODE); 
+ when OTHERS then
+    DBMS_OUTPUT.PUT_LINE('Another exception was raised '||SQLERRM);
+    DBMS_OUTPUT.PUT_LINE('Error code: '||SQLCODE);
+END;
+/
+
+/*
+Collections:
+  index-by-tables: similar to hash tables from other programming languages
+    unbounded number of elements, follows the key (subscript)-value format
+    the key can be a string or a number
+*/ 
+/*
+declare
+  type t_emp is table of number index by varchar2(1); -- index by table
+  -- the key is of type varchar2 and the value is numeric
+  v t_emp;
+  i varchar2(1);
+begin
+   v('a'):=ascii('a');
+   v('b'):=ascii('b');
+   v('t'):=ascii('t');
+   v('z'):=ascii('z');
+   v('A'):=ascii('A');
+   
+   i:=v.first;
+   while i is not null loop
+       dbms_output.put_line(i||'->'||v(i));
+       i:=v.next(i); -- get me the next key after i
+   end loop;
+   
+end;
+/
+
+
+declare
+  type t_emp is table of employees%rowtype index by pls_integer; -- index by table
+  -- the key is of type numeric and the value is a record from employees
+  v t_emp;
+begin
+  select * into v(150) from employees where employee_id=150; 
+  select * into v(120) from employees where employee_id=120;
+  select * into v(200) from employees where employee_id=200; 
+  dbms_output.put_line('Number of elements: '||v.count);
+  v.delete(120);
+  v(3000):=v(150);
+  dbms_output.put_line('Number of elements: '||v.count);
+  dbms_output.put_line('Name:'||v(3000).last_name||' '||v(3000).first_name);
+end;
+/
+
+-- display all the employees from v
+
+--Cursor
+SET SERVEROUTPUT ON
+DECLARE
+  V NUMBER;
+  D VARCHAR2(500);
+BEGIN
+  V:='123789'; -- IMPLICIT CONV FROM VARCHAR TO NUMBER
+  DBMS_OUTPUT.PUT_LINE('V='||V);
+  D:=TO_CHAR(SYSDATE,'DD.MM.YYYY HH24:MI:SS'); -- EXPLICIT CONV FROM DATE TO VARCHAR
+ DBMS_OUTPUT.PUT_LINE('D='||D);
+END;
+/
+
+-- IMPLICIT CURSOR
+
+BEGIN
+   DBMS_OUTPUT.PUT_LINE('NO OF INSERTED ROWS: '||SQL%ROWCOUNT);
+   -- BEFORE ANY DML STATEMENT ALL IMPLICIT CURSOR ATTRIBUTES ARE NULL
+   INSERT INTO REGIONS VALUES (
+  -- (SELECT MAX(REGION_ID)+1 FROM REGIONS )  -- NOT "THREAD" SAFE -> TWO USERS CAN GET THE SAME VALUE
+  REGION_ID_S.NEXTVAL -- "THREAD" SAFE
+   ,'A NEW REGION');
+ --  INSERT INTO REGIONS SELECT EMPLOYEE_ID, FIRST_NAME FROM EMPLOYEES;
+   DBMS_OUTPUT.PUT_LINE('NO OF INSERTED ROWS: '||SQL%ROWCOUNT);
+  ROLLBACK;
+  DBMS_OUTPUT.PUT_LINE('NO OF INSERTED ROWS: '||SQL%ROWCOUNT);
+  UPDATE EMPLOYEES SET SALARY=SALARY*1.15, COMMISSION_PCT=COMMISSION_PCT+0.01 
+          WHERE COMMISSION_PCT > 10;
+
+  IF SQL%FOUND THEN
+     DBMS_OUTPUT.PUT_LINE('AT LEAST ONE SALARY WAS INCREASED');
+     DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT);
+   ELSE  
+--   RAISE NO_DATA_FOUND;
+   DBMS_OUTPUT.PUT_LINE('NO SALARIES WERE INCREASED');
+  END IF; 
+   
+   
+   DELETE FROM PRODUCT_INFORMATION WHERE PRODUCT_ID  NOT IN (SELECT PRODUCT_ID FROM
+       ORDER_ITEMS);
+       
+     DBMS_OUTPUT.PUT_LINE('PRDUCTS DELETED:'||SQL%ROWCOUNT);
+     ROLLBACK;
+      EXCEPTION WHEN 
+      NO_DATA_FOUND THEN   DBMS_OUTPUT.PUT_LINE('EXCEPTION-NO SALARIES WERE INCREASED');
+         /*
+   UPDATES AND DELETES DON'T RAISE NO_DATA_FOUND OR TOO_MANY_ROWS
+   *//*
+END;
+/
+
+DESC REGIONS;
+
+SELECT * FROM REGIONS;
+SELECT * FROM EMPLOYEES;
+ROLLBACK;
+
+CREATE SEQUENCE REGION_ID_S START WITH 11 NOCACHE;
+
+DECLARE
+  V_SAL EMPLOYEES.SALARY%TYPE;
+
+BEGIN
+    SELECT SALARY INTO V_SAL FROM EMPLOYEES WHERE EMPLOYEE_ID IN (1010,102);
+    DBMS_OUTPUT.PUT_LINE('NO=1');
+
+END;
+/
+
+DECLARE
+  TYPE T_VAL IS TABLE OF NUMBER INDEX BY PLS_INTEGER;
+  V_SAL T_VAL;
+
+BEGIN
+    SELECT SALARY BULK COLLECT INTO V_SAL FROM EMPLOYEES WHERE EMPLOYEE_ID > 110;
+    DBMS_OUTPUT.PUT_LINE('NO='||SQL%ROWCOUNT);
+
+END;
+/
+
+/*ip: 193.226.34.57
+port: 1521
+sid: oradb*/
+/*
+set serveroutput on
+declare
+   n number;  -- up until 38 digits
+   v varchar2(500):='Vlad';
+   c char:='V'; -- no length -> 1 char
+begin
+   -- we can use sql single row functions directly into plsql statements
+   -- with the exception of DECODE
+    dbms_output.put_line('V='||length(v));
+    dbms_output.put_line('C='||length(c));
+    n:=trunc(100.278);
+    if mod(n,2)=0 then
+       dbms_output.put_line('It''s even');
+     else   
+     dbms_output.put_line('It''s odd');
+   end if;  
+   
+   --v:=decode(n,100,'It''s 100','It''s not 100');
+   
+   select decode(n,100,'It''s 100','It''s not 100') into v from dual;
+   --select trunc(7.8908) into n from dual; --unnecesary context swicth
+   
+    dbms_output.put_line(v);
+    
+    -- we can't use aggregate sql functions directly into plsql statements
+    -- we ca use them in sql statements
+    n:=least(100,120,150);
+    dbms_output.put_line('n='||n);
+    
+    select count(salary) into n from employees where department_id=505;
+    dbms_output.put_line('count='||n);
+    
+end;
+/
+
+--select 797+100 from dual;
+desc employees;
+
+select greatest(salary,nvl(COMMISSION_PCT,0)) from employees;
+declare
+  n number;
+begin
+-- inside of a plsql block we can use dml and dtl statements
+-- we can't use ddl and dcl statements directly, we can use them through execute immediate or dbms_sql
+ --execute immediate 'drop table tab120';
+ select  count(*) into n from user_tables where table_name='TAB120';
+ if n=0 then
+   execute immediate 'create table tab120(col1 number primary key, col2 varchar2(100))';
+   dbms_output.put_line('I have created the table');
+ else
+   execute immediate 'drop table tab120';
+   dbms_output.put_line('I have dropped the table');
+ end if;  
+
+end;
+/
+
+select * from user_constraints where table_name='EMPLOYEES';
+select * from user_tables;
+
+
+declare
+  n number;
+  c1 number;
+  c2 varchar2(100);
+begin
+-- inside of a plsql block we can use dml and dtl statements
+-- we can't use ddl and dcl statements directly, we can use them through execute immediate or dbms_sql
+ --execute immediate 'drop table tab120';
+ -- execute immediate can also be used for dynamic sql and dynamic plsql
+   c1:=10;
+   c2:='Row 10';
+   execute immediate 'create table tab120(col1 number primary key, col2 varchar2(100))';
+   execute immediate 'insert into tab120 values(:1,:2)' using c1,c2;
+   --execute immediate 'insert into tab120 values('||c1|..
+    execute immediate 'begin null; end;';
+   dbms_output.put_line('I have created the table');
+ exception when others then
+   execute immediate 'drop table tab120';
+   dbms_output.put_line('I have dropped the table');
+ 
+
+end;
+/
+
+select * from tab120;
+
+/*Cursors
+  - Implicit
+  - Explicit
+  
+  *//*
+  SET SERVEROUTPUT ON
+  declare
+    cursor c is select product_id, LOWER(product_name) PN, list_price from product_information
+        where category_id=17 AND LIST_PRICE>233 ORDER BY LIST_PRICE DESC;
+        -- C%ISOPEN, C%FOUND, C%NOTFOUND, C%ROWCOUNT
+     r c%rowtype;
+begin
+   OPEN C;
+    IF NOT C%ISOPEN THEN
+       OPEN C;
+    END IF;
+    LOOP
+      FETCH C INTO R;
+      EXIT WHEN C%NOTFOUND OR C%ROWCOUNT>3;
+      DBMS_OUTPUT.PUT_LINE(C%ROWCOUNT||'->'||R.PN||' HAS A PRICE OF '||R.LIST_PRICE);
+      
+      
+    END LOOP;
+
+end;
+/
+
+  declare
+    cursor c(P_CATEG_ID NUMBER) is select product_id, LOWER(product_name) PN, list_price from product_information
+        where category_id=P_CATEG_ID ORDER BY LIST_PRICE DESC;
+        -- C%ISOPEN, C%FOUND, C%NOTFOUND, C%ROWCOUNT
+     r c%rowtype;
+begin
+  
+    IF NOT C%ISOPEN THEN
+       OPEN C(11);
+    END IF;
+    LOOP
+      FETCH C INTO R;
+      EXIT WHEN C%NOTFOUND;
+      DBMS_OUTPUT.PUT_LINE(R.PN||' HAS A PRICE OF '||R.LIST_PRICE);
+      
+      
+    END LOOP;
+    
+    DBMS_OUTPUT.PUT_LINE('THERE ARE '||C%ROWCOUNT||' PRODUCTS IN CATEGORY 11');
+    CLOSE C;
+    DBMS_OUTPUT.PUT_LINE(R.PN||' HAS A PRICE OF '||R.LIST_PRICE);
+end;
+/
+
+  declare
+    cursor c(P_CATEG_ID NUMBER) is select product_id, LOWER(product_name) PN, list_price from product_information
+        where category_id=P_CATEG_ID ORDER BY LIST_PRICE DESC;
+    CURSOR D IS SELECT CATEGORY_ID FROM PRODUCT_INFORMATION GROUP BY category_id
+      ORDER BY COUNT(*) DESC;
+    V_CATEGORY_ID NUMBER;
+
+        -- C%ISOPEN, C%FOUND, C%NOTFOUND, C%ROWCOUNT     
+begin
+   OPEN D;
+   FETCH D INTO V_CATEGORY_ID;
+   CLOSE D;
+   DBMS_OUTPUT.PUT_LINE('THE CATEG WITH MOST PROD IS '||V_CATEGORY_ID);
+   -- USING A CURSOR DISPLAY THE PRODUCTS FROM THE CATEG WITH MOST PRODUCTS
+    FOR R IN C(V_CATEGORY_ID) LOOP
+            DBMS_OUTPUT.PUT_LINE(R.PN||' HAS A PRICE OF '||R.LIST_PRICE);      
+     END LOOP;
+    
+    --DBMS_OUTPUT.PUT_LINE('THERE ARE '||C%ROWCOUNT||' PRODUCTS IN CATEGORY 17');
+    --CLOSE C;
+    --DBMS_OUTPUT.PUT_LINE(R.PN||' HAS A PRICE OF '||R.LIST_PRICE);
+end;
+/
+
+SELECT * FROM (SELECT CATEGORY_ID,COUNT(*) NO FROM PRODUCT_INFORMATION 
+GROUP BY category_id
+ORDER BY COUNT(*) DESC) WHERE ROWNUM<=1;  -- PRE ORACLE 12C
+   --DESC PRODUCT_INFORMATION
+   -- INLINE VIEW
+   
+SELECT CATEGORY_ID,COUNT(*) NO FROM PRODUCT_INFORMATION 
+GROUP BY category_id
+ORDER BY COUNT(*) DESC  FETCH FIRST 1 ROW ONLY; --STARTING FROM ORACLE 12C
+
+
+  declare
+    cursor c(P_CATEG_ID NUMBER) is select product_id, LOWER(product_name) PN, list_price from product_information
+        where category_id=P_CATEG_ID ORDER BY LIST_PRICE DESC;
+
+    V_CATEGORY_ID NUMBER;
+
+        -- C%ISOPEN, C%FOUND, C%NOTFOUND, C%ROWCOUNT     
+begin
+    SELECT CATEGORY_ID INTO V_CATEGORY_ID  FROM PRODUCT_INFORMATION 
+    GROUP BY category_id
+    ORDER BY COUNT(*) DESC  FETCH FIRST 1 ROW ONLY; 
+    -- SELECT WITH INTO MIGHT RAISE NO_DATA_FOUND
+    -- FETCH DOESN'T RAISE NO_DATA_FOUND
+   DBMS_OUTPUT.PUT_LINE('THE CATEG WITH MOST PROD IS '||V_CATEGORY_ID);
+   -- USING A CURSOR DISPLAY THE PRODUCTS FROM THE CATEG WITH MOST PRODUCTS
+    FOR R IN C(V_CATEGORY_ID) LOOP
+            DBMS_OUTPUT.PUT_LINE(R.PN||' HAS A PRICE OF '||R.LIST_PRICE);      
+     END LOOP;
+    
+    --DBMS_OUTPUT.PUT_LINE('THERE ARE '||C%ROWCOUNT||' PRODUCTS IN CATEGORY 17');
+    --CLOSE C;
+    --DBMS_OUTPUT.PUT_LINE(R.PN||' HAS A PRICE OF '||R.LIST_PRICE);
+    EXCEPTION WHEN OTHERS THEN NULL;
+end;
+/
+
+  declare    
+    V_CATEGORY_ID NUMBER;
+    -- C%ISOPEN, C%FOUND, C%NOTFOUND, C%ROWCOUNT     
+begin
+    SELECT CATEGORY_ID INTO V_CATEGORY_ID  FROM PRODUCT_INFORMATION 
+    GROUP BY category_id
+    ORDER BY COUNT(*) DESC  FETCH FIRST 1 ROW ONLY; 
+    -- SELECT WITH INTO MIGHT RAISE NO_DATA_FOUND
+    -- FETCH DOESN'T RAISE NO_DATA_FOUND
+   DBMS_OUTPUT.PUT_LINE('THE CATEG WITH MOST PROD IS '||V_CATEGORY_ID);
+   -- USING A CURSOR DISPLAY THE PRODUCTS FROM THE CATEG WITH MOST PRODUCTS
+    FOR R IN (select product_id, LOWER(product_name) PN, list_price from product_information
+        where category_id=V_CATEGORY_ID ORDER BY LIST_PRICE DESC) LOOP
+        --INLINE CURSOR->NO CURSOR ATTRIBUTES
+            DBMS_OUTPUT.PUT_LINE(R.PN||' HAS A PRICE OF '||R.LIST_PRICE);      
+     END LOOP;
+    
+    --DBMS_OUTPUT.PUT_LINE('THERE ARE '||C%ROWCOUNT||' PRODUCTS IN CATEGORY 17');
+    --CLOSE C;
+    --DBMS_OUTPUT.PUT_LINE(R.PN||' HAS A PRICE OF '||R.LIST_PRICE);
+    EXCEPTION WHEN OTHERS THEN NULL;
+end;
+/
+
+--Display all the job titles (JOBS) for which there are more than 3 employees (EMPLOYEES).
+--Under each job title display the employees having those jobs
+-- After displaying all the employees from a job display the sum of salaries for that job
+SELECT JOB_TITLE FROM JOBS WHERE job_id IN
+(SELECT JOB_ID FROM EMPLOYEES GROUP BY JOB_ID HAVING COUNT(*)>3);
+
+SELECT * FROM JOBS;
+--SELECT DISTINCT JOB_ID FROM EMPLOYEES;
+SET SERVEROUTPUT ON
+DECLARE
+  CURSOR J IS SELECT JOB_TITLE,JOB_ID FROM JOBS WHERE job_id IN
+    (SELECT JOB_ID FROM EMPLOYEES GROUP BY JOB_ID HAVING COUNT(*)>3);
+  CURSOR E(P_JOB_ID VARCHAR2) IS SELECT FIRST_NAME,LAST_NAME,SALARY FROM EMPLOYEES
+     WHERE JOB_ID=P_JOB_ID;
+  V_SUM_SAL NUMBER;  
+BEGIN
+  FOR R1 IN J LOOP
+    DBMS_OUTPUT.PUT_LINE(R1.JOB_TITLE);
+    V_SUM_SAL:=0;
+    FOR R2 IN E(R1.JOB_ID) LOOP
+      DBMS_OUTPUT.PUT_LINE('    '||R2.FIRST_NAME||' '||R2.LAST_NAME);
+      V_SUM_SAL:=V_SUM_SAL+R2.SALARY;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('  SUM OF SALARIES FOR '||R1.JOB_TITLE||' IS '||V_SUM_SAL);
+  END LOOP;
+
+END;
+/
+-- FOR UPDATE CURSOR
+
+-- INCREASE BY 5% ALL THE SALARIES FROM THE DEPARTMENT WITH THE SMALLEST AVG SALARY
+
+SELECT DEPARTMENT_ID FROM EMPLOYEES GROUP BY DEPARTMENT_ID ORDER BY AVG(SALARY) FETCH FIRST 1 ROW ONLY;
+
+DECLARE
+ V_DEP_ID NUMBER;
+BEGIN
+  SELECT DEPARTMENT_ID INTO V_DEP_ID FROM EMPLOYEES 
+  GROUP BY DEPARTMENT_ID ORDER BY AVG(SALARY) FETCH FIRST 1 ROW ONLY;
+
+  UPDATE EMPLOYEES SET SALARY=SALARY*1.05 WHERE DEPARTMENT_ID=V_DEP_ID;
+  ROLLBACK;
+END;
+/
+
+SELECT * FROM EMPLOYEES WHERE DEPARTMENT_ID=50;
+
+DECLARE
+ V_DEP_ID NUMBER;
+ CURSOR C(P_DEP_ID NUMBER) IS SELECT FIRST_NAME,LAST_NAME,SALARY FROM EMPLOYEES 
+     WHERE DEPARTMENT_ID=P_DEP_ID FOR UPDATE WAIT 5;
+BEGIN
+  SELECT DEPARTMENT_ID INTO V_DEP_ID FROM EMPLOYEES 
+  GROUP BY DEPARTMENT_ID ORDER BY AVG(SALARY) FETCH FIRST 1 ROW ONLY;
+  
+  FOR R IN C(V_DEP_ID) LOOP
+    UPDATE EMPLOYEES SET SALARY=SALARY*1.05 WHERE CURRENT OF C;
+    DBMS_OUTPUT.PUT_LINE(R.FIRST_NAME||' '||R.LAST_NAME||' HAS A NEW SALARY OF '||R.SALARY*1.05);
+  END LOOP;
+ -- ROLLBACK;
+ EXCEPTION WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('CAN''T DO THE UPDATE');
+END;
+/
+
+SELECT * FROM EMPLOYEES WHERE DEPARTMENT_ID=50;
+
+
+DECLARE
+ V_DEP_ID NUMBER;
+ CURSOR C IS SELECT FIRST_NAME,LAST_NAME,SALARY FROM EMPLOYEES ORDER BY SALARY DESC; 
+
+BEGIN
+FOR J IN 1..10000 LOOP
+  FOR R IN C LOOP
+    DBMS_OUTPUT.PUT_LINE(R.FIRST_NAME||' '||R.LAST_NAME||' HAS A NEW SALARY OF '||R.SALARY);
+  END LOOP;
+END LOOP;  
+-- 2.065
+-- 3.185
+ EXCEPTION WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('CAN''T DO THE UPDATE');
+END;
+/
+SET SERVEROUTPUT ON
+DECLARE
+ TYPE R IS RECORD(
+ FIRST_NAME EMPLOYEES.FIRST_NAME%TYPE,
+ LAST_NAME EMPLOYEES.LAST_NAME%TYPE,
+ SALARY EMPLOYEES.SALARY%TYPE);
+ 
+ --TYPE T IS TABLE OF R INDEX BY PLS_INTEGER; -- INDEX BY TABLE (MAPS), PLSQL ONLY
+ --TYPE T IS TABLE OF R; -- NESTED TABLE, PLSQL AND SQL
+ TYPE T IS VARRAY(150) OF R; -- VARRAY, PLSQL AND SQL
+ V T;
+
+BEGIN
+--FOR J IN 1..10000 LOOP
+SELECT FIRST_NAME,LAST_NAME,SALARY BULK COLLECT INTO V FROM EMPLOYEES ORDER BY SALARY DESC; 
+  FOR I IN 1..V.COUNT LOOP
+    DBMS_OUTPUT.PUT_LINE(I||'->'||V(I).FIRST_NAME||' '||V(I).LAST_NAME||' HAS A NEW SALARY OF '||V(I).SALARY);
+  END LOOP;
+  V.DELETE;
+--END LOOP;
+-- 1.933
+-- 2.946
+ EXCEPTION WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('ERROR-'||SQLERRM);
+END;
+/
+
+select * from user_tables; -- data dictionary
+select * from cat where table_name not like 'BIN%';
+
+EXCEPTIONS
+
+/*COMPILATION TIME ERRORS
+    - ARE DETECTED BY THE PLSQL ENGINE
+    - CAN'T BE HANDLED IN THE EXCEPTION BLOCK*/
+    /*
+DECLARE
+  N CONSTANT NUMBER(5):=1000;
+BEGIN
+ --  N:=1000;
+ --NULL;
+END;
+/
+
+RUN TIME ERRORS (EXCEPTIONS)
+   - PREDEFINED EXCEPTIONS
+   - NON PREDEFINED EXCEPTIONS
+   - USER DEFINE EXCEPTIONS
+
+SET SERVEROUTPUT ON
+DECLARE
+  N NUMBER(2):=-99;
+BEGIN
+ N:=1000;
+ EXCEPTION 
+    WHEN VALUE_ERROR THEN
+      DBMS_OUTPUT.PUT_LINE('AN EXCEPTION HAS OCCURED');
+END;
+/
+
+CREATE SEQUENCE LOG_EXC_ID_S START WITH 1;
+
+CREATE TABLE LOG_EXC(
+LOG_ID NUMBER DEFAULT LOG_EXC_ID_S.NEXTVAL PRIMARY KEY,
+EXC_USER VARCHAR2(1000),
+EXC_DATE DATE,
+EXC_CODE NUMBER);
+ACCEPT S_REG PROMPT "REGION NAME" 
+-- S_REG IS A SUBSTITUTION VAR
+VARIABLE ID_REG NUMBER
+DECLARE
+  C NUMBER(5);
+BEGIN
+  -- C:=100000;
+   :ID_REG:=1;
+   INSERT INTO REGIONS VALUES(:ID_REG,'&S_REG');
+   EXCEPTION
+    WHEN DUP_VAL_ON_INDEX THEN
+       UPDATE REGIONS SET REGION_NAME='&S_REG' WHERE REGION_ID=:ID_REG;
+    WHEN OTHERS THEN
+       DBMS_OUTPUT.PUT_LINE('AN EXCEPTION HAS OCCURED->'||SQLERRM);
+       DBMS_OUTPUT.PUT_LINE('AN EXCEPTION HAS OCCURED->'||SQLCODE);
+       -- SQLERRM AND SQLCODE CAN'T BE USED DIRECTLY IN SQL STATEMENTS
+       C:=SQLCODE;
+       INSERT INTO LOG_EXC(EXC_USER,EXC_DATE,EXC_CODE) VALUES (USER,SYSDATE,C);
+        COMMIT;
+END;
+/
+PRINT ID_REG
+BEGIN
+    :ID_REG:=:ID_REG+100;
+    DBMS_OUTPUT.PUT_LINE('VAL='||:ID_REG);
+END;
+/
+
+
+SELECT * FROM REGIONS;
+
+SELECT USER,SYSDATE FROM DUAL;
+
+SELECT * FROM LOG_EXC;
+
+
+ROLLBACK;
+
+DECLARE 
+   NN_EXC EXCEPTION;
+   PRAGMA EXCEPTION_INIT(NN_EXC,-01407);
+BEGIN
+   UPDATE EMPLOYEES SET EMAIL=NULL WHERE EMPLOYEE_ID=120;
+   EXCEPTION
+     WHEN NN_EXC THEN
+       DBMS_OUTPUT.PUT_LINE('AN EXCEPTION HAS OCCURED->'||SQLERRM);
+END;
+/
+
+-- CREATE A TABLE, IF IT EXISTS, DROP IT!
+ACCEPT MY_TABLE PROMPT "TABLE NAME"
+DECLARE
+   TAB_EXISTS EXCEPTION;
+   PRAGMA EXCEPTION_INIT(TAB_EXISTS,-00955);
+BEGIN
+
+  EXECUTE IMMEDIATE 'CREATE TABLE &MY_TABLE(N NUMBER PRIMARY KEY)';
+  DBMS_OUTPUT.PUT_LINE('TABLE CREATED');
+  
+EXCEPTION 
+   WHEN TAB_EXISTS THEN
+     EXECUTE IMMEDIATE 'DROP TABLE &MY_TABLE';
+     DBMS_OUTPUT.PUT_LINE('TABLE DROPED');
+END;
+/
+
+set SERVEROUTPUT on
+declare
+  is_not_null exception;
+  pragma exception_init(is_not_null,-01400);
+  
+  ch_not_null exception;
+  pragma exception_init(ch_not_null,-01407);
+begin
+ --insert into employees(employee_id,first_name) values (1001, 'John');
+ update employees set email=null where employee_id=200;
+   exception
+    when is_not_null or ch_not_null then
+      dbms_output.put_line('Not enough values');
+end;
+/
+
+declare
+  no_emp exception;
+  pragma exception_init(no_emp,-20101);
+BEGIN
+   UPDATE employees SET salary = salary + 100 WHERE employee_id = 1000;
+   if SQL%NOTFOUND then 
+      raise_application_error(-20101, 'The employee does not exist');
+      --raise no_emp;
+      --raise no_data_found;
+      --  -20999..-20000
+   end if;
+   dbms_output.put_line('a');
+   exception
+   when no_emp then
+   dbms_output.put_line('b->'||sqlerrm);
+END;
+/
+
+
+select user from dual;
+
+Subprograms
+ - procedures
+ - functions
+ 
+ Parameters
+  - IN
+  - OUT
+  -IN OUT
+  
+SELECT * FROM CUSTOMERS;
+
+CREATE OR REPLACE PROCEDURE INCREASE_LIMIT(P_COUNTRY_ID  VARCHAR2 DEFAULT 'IT', NO_CUST OUT NUMBER) IS
+  R NUMBER:=1.1;
+BEGIN
+    UPDATE CUSTOMERS SET CREDIT_LIMIT=CREDIT_LIMIT*R WHERE COUNTRY=P_COUNTRY_ID;
+    NO_CUST:=SQL%ROWCOUNT;
+    --COMMIT;
+END;
+/
+
+SELECT * FROM USER_SOURCE WHERE NAME='INCREASE_LIMIT';
+
+CALL INCREASE_LIMIT('US');
+EXECUTE INCREASE_LIMIT('US');
+
+SET SERVEROUTPUT ON
+
+DECLARE 
+  N NUMBER;
+BEGIN
+ INCREASE_LIMIT(NO_CUST=>N);
+ IF N<10 THEN
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('COMMIT-'||N);
+  ELSE
+    ROLLBACK;
+    DBMS_OUTPUT.PUT_LINE('ROLLBACK-'||N);
+  END IF;  
+END;
+/
+
+ROLLBACK;
+
+SELECT * FROM PRODUCT_INFORMATION;
+
+/*CREATE A PROCEDURE THAT TAKES IN A PARAMETER X AND DISPLAYS THE CATEGORIES FOR WHICH ALL PRODUCTS
+HAVE A LIST_PRICE>X. IF NO SUCH CATEGORIES EXIST, RAISE AN EXC IN THE PROCEDURE. CALL THE PROCEDURE
+FROM AN ANONYMOUS BLOCK. HANDLE THE EXCEPTION.*/
+/*
+SELECT PRODUCT_ID,CATEGORY_ID,LIST_PRICE FROM PRODUCT_INFORMATION ORDER BY 2,3;
+
+SELECT CATEGORY_ID FROM PRODUCT_INFORMATION GROUP BY CATEGORY_ID HAVING NVL(MIN(LIST_PRICE),0)>50;
+
+CREATE OR REPLACE PROCEDURE GET_CATEG(X NUMBER) IS
+  CURSOR C IS 
+     SELECT CATEGORY_ID FROM PRODUCT_INFORMATION GROUP BY CATEGORY_ID HAVING NVL(MIN(LIST_PRICE),0)>X;
+     R C%ROWTYPE;
+BEGIN
+   OPEN C;
+    LOOP
+      FETCH C INTO R;
+       EXIT WHEN C%NOTFOUND;
+       DBMS_OUTPUT.PUT_LINE(R.CATEGORY_ID);
+    END LOOP;
+    IF C%ROWCOUNT=0 THEN
+       RAISE_APPLICATION_ERROR(-20000,'NO SUCH CATEGORY');
+    END IF;
+    CLOSE C;
+END;
+/
+
+SET SERVEROUTPUT ON
+DECLARE
+   NO_CAT EXCEPTION;
+   PRAGMA EXCEPTION_INIT(NO_CAT,-20000);
+BEGIN
+  GET_CATEG(X=>500);
+  EXCEPTION WHEN NO_CAT THEN
+      DBMS_OUTPUT.PUT_LINE('I''VE JUST HANDLED THE EXCEPTION');
+END;
+/
+
+/*Subprograms
+  - procedure
+  - functions
+  *//*
+ create or replace function get_categ_val(p_category number) return number is
+   v_val number;
+ begin
+     select nvl(sum(discount_price*quantity),0) into v_val from order_items o join product_information p on o.product_id=p.product_id
+ where category_id=p_category;
+  -- if 
+    return v_val;
+ 
+ end;
+ /
+ -- Get the total ordered value for all products in categ 28
+ select * from product_information;
+
+ 
+ select nvl(sum(discount_price*quantity),0) val from order_items o join product_information p on o.product_id=p.product_id
+ where category_id=1300;
+ 
+ 
+ select * from user_source where lower(name)='get_categ_val';
+ set SERVEROUTPUT ON
+ 
+ declare
+    v_val number;
+ begin
+ v_val:=get_categ_val(p_category=>11);
+ dbms_output.put_line('Val='||v_val);
+ end;
+ /
+ 
+ begin
+ dbms_output.put_line('Val='||get_categ_val(p_category=>11));
+ 
+ if get_categ_val(p_category=>11)>50000 then
+    dbms_output.put_line('Big Val');
+end if;    
+ 
+ end;
+ /
+ 
+ select product_id,product_name,category_id,get_categ_val(category_id) val_categ from product_information
+ where get_categ_val(category_id)>50000
+ order by get_categ_val(category_id) desc;
+ 
+ 
+ select distinct category_id,serie_g.get_categ_val(category_id) val_categ from product_information order by 1;
+ 
+  
+ create or replace package serie_g is
+  tax_rate constant number:=0.16; 
+  function get_categ_val(p_category number) return number;
+  function get_val return number;
+  /* use function .... to ...*/
+ /*
+ end;
+ /
+ 
+ 
+  create or replace package body serie_g as
+  vat constant number:=0.19; 
+   function get_categ_val(p_category number) return number is
+           v_val number;
+         begin
+             select nvl(sum(discount_price*quantity),0) into v_val from order_items o join product_information p on o.product_id=p.product_id
+         where category_id=p_category;
+          -- if 
+            return v_val;
+         
+         end;
+  function get_val return number is
+  begin
+    return nvl(vat,0);
+  end;
+  
+  
+ end;
+ /
+ 
+ begin
+ dbms_output.put_line('Big tax='||serie_g.tax_rate);
+ dbms_output.put_line('Big vat='||serie_g.get_val);
+ end;
+ /
+ 
+ select distinct category_id,serie_g.get_categ_val(category_id) val_categ from product_information order by 1;
+ 
+ select * from user_source where lower(name)='serie_g';
+ 
+ 
+ /*Packages
+- specs
+- body
+*/
+-- Why we use packages
+-- packages allow separation between signuture and the content
+-- perfomance boost when those functions and procedures are frequently used together
+
+-- Packages types
+-- predefined packages (owner: user sys): dbms_output, utl_smtp plus many, many others
+-- user defined packages
+/*
+create or replace package var_and_const is
+  vat_rate float:=0.19;
+  tax_rate float:=0.16;
+  
+  max_tries int:=5;  -- int is a predefined subtype of number
+  
+  manager string(20):='Steven King'; -- string and varchar are subtypes of varchar2
+  
+  no_row exception;
+  pragma EXCEPTION_INIT (no_row, -20001);
+  /* we will use this exception when an update or delete statement doesn't impact any rows
+  */
+  /*
+  type t_row is record(
+    product_id number,
+    product_name varchar2(100));
+  
+  cursor c is select product_id,product_name from product_information;  
+  
+  function get_vat return number;
+
+end var_and_const;
+/
+
+create or replace package body var_and_const is
+
+function get_inc return number is
+begin
+  return 0.01;
+end get_inc;
+
+function get_vat return number is
+begin
+   return vat_rate+get_inc;
+end get_vat;
+
+begin
+  -- runs only the first time a package is run in a given session
+  vat_rate:=vat_rate+0.05;
+end var_and_const;
+/
+-- Variables, constants, cursors and exceptions declared in the spec part of a package are public
+-- and can be accessed by other plsql blocks without needing "getter" functions
+
+set serveroutput on
+declare
+  r var_and_const.t_row;
+begin
+   open var_and_const.c;
+   
+   loop
+     fetch var_and_const.c into r;
+     exit when var_and_const.c%notfound; 
+     dbms_output.put_line(r.product_id||'->'||r.product_name);
+   end loop;
+   close var_and_const.c;
+   dbms_output.put_line('Vat rate='||var_and_const.vat_rate);
+   update product_information set list_price=list_price*(1+var_and_const.vat_rate) where product_id=24140;
+   
+   if SQL%NOTFOUND then 
+       raise_application_error(-20001,'No product was found');
+   end if;    
+
+exception
+  when var_and_const.no_row then
+    dbms_output.put_line('An exception has occured-'||SQLERRM);
+end;
+/
+
+-- in sql statements, outside plsql blocks, we can't access public var from packages directly
+select product_id,list_price,list_price*(1+var_and_const.get_vat) price_with_vat from product_information;
+
+update product_information set list_price=list_price*(1+var_and_const.get_inc) where product_id=2414;
+
+
+select * from user_source;
+
+
+begin
+  dbms_output.put_line(var_and_const.get_vat);
+end;
+/
+
+
+select var_and_const.validate_cnp('1930420179841') from dual;
+
+alter table employees add cnp varchar2(13);
+
+update employees set cnp='1930116229966' where employee_id=100;
+update employees set cnp='2960524437687' where employee_id=101;
+update employees set cnp='1931125037503' where employee_id=102;
+
+select * from employees where var_and_const.validate_cnp(cnp)=-1;
+
+create or replace package var_and_const is
+  vat_rate float:=0.19;
+  tax_rate float:=0.16;
+
+  max_tries int:=5;  -- int is a predefined subtype of number
+
+  manager string(20):='Steven King'; -- string and varchar are subtypes of varchar2
+
+  no_row exception;
+  pragma EXCEPTION_INIT (no_row, -20001);
+  /* we will use this exception when an update or delete statement doesn't impact any rows
+  */
+/*
+  type t_row is record(
+    product_id number,
+    product_name varchar2(100));
+
+  cursor c is select product_id,product_name from product_information;  
+
+  function get_vat return number;
+  function validate_cnp(p_cnp varchar2) return number;
+  -- boolean is a plsql data type, so it can't be used in sql statements
+
+end var_and_const;
+/
+create or replace package body var_and_const is
+
+function get_inc return number is
+begin
+  return 0.01;
+end get_inc;
+
+function get_vat return number is
+begin
+   return vat_rate+get_inc;
+end get_vat;
+
+function validate_cnp(p_cnp varchar2) return number is
+  
+  const varchar2(12):='279146358279'; 
+  sum_d number := 0;
+  r number:=0;
+  dob date;
+  age number;
+ 
+begin
+  if p_cnp is null then
+    return null;
+  end if;  
+
+  if length(p_cnp)!=13 then
+    return -1;
+  else
+    for i in 1..12 loop
+      sum_d:=sum_d+(substr(p_cnp,i,1)*substr(const,i,1));
+    end loop;
+  end if;  
+ 
+  r:=sum_d mod 11;
+ 
+
+  if (r=substr(p_cnp,13,1) or (r=10 and substr(p_cnp,13,1)=1)) then
+     return 1;
+  else
+     return -1;
+  end if;
+ 
+end;
+
+
+begin
+  vat_rate:=vat_rate+0.05;
+end var_and_const;*/
